@@ -1,208 +1,146 @@
-// 'use strict';
+'use strict';
 
-// // Uncomment the next lines to use your game instance in the browser
-// const Game = require('../modules/Game.class');
-// const game = new Game();
+// Uncomment the next lines to use your game instance in the browser
+const Game = require('../modules/Game.class');
+const game = new Game();
 
-// function eventListenerForArrows() {
-//   addEventListener('keydown', (e) => {
-//     switch (e.key) {
-//       case 'ArrowUp':
-//       case 'w':
-//         // moveUp();
-//         console.log('w - Up');
-//         break;
-//       case 'ArrowDown':
-//       case 's':
-//         // moveDown();
-//         console.log('s - Down');
-//         break;
-//       case 'ArrowLeft':
-//       case 'a':
-//         // moveLeft();
-//         console.log('a - Left');
-//         break;
-//       case 'ArrowRight':
-//       case 'd':
-//         // moveRight();
-//         console.log('d - Right');
-//         break;
-//     }
-//   });
-// }
+const domMas = [...document.querySelectorAll('tr')].map((tr) => [
+  ...tr.children,
+]);
 
-// function startTheGame() {
-//   const buttonStart = document.querySelector('.button.start');
+const buttonStart = document.querySelector('.button.start');
+const messageStart = document.querySelector('.message.message-start');
+const buttonRestart = document.createElement('button');
 
-//   buttonStart.addEventListener('click', (e) => {
-//     console.log(e.target);
-//   });
+let wasPressed = true;
 
-//   console.log(buttonStart.textContent);
-// }
+function eventListenerForArrows() {
+  document.addEventListener('keydown', (e) => {
+    switch (e.key) {
+      case 'ArrowUp':
+      case 'w':
+        if (wasPressed) {
+          buttonStart.replaceWith(buttonRestart);
+          wasPressed = false;
+        }
+        clearField();
 
-// eventListenerForArrows();
+        if (game.getStatus() === 'playing') {
+          game.moveUp();
+        }
+        connectJsCellsWithDOM();
+        changeScore();
+        checkStatus();
+        break;
+      case 'ArrowDown':
+      case 's':
+        if (wasPressed) {
+          buttonStart.replaceWith(buttonRestart);
+          wasPressed = false;
+        }
+        clearField();
 
-// startTheGame();
+        if (game.getStatus() === 'playing') {
+          game.moveDown();
+        }
+        connectJsCellsWithDOM();
+        changeScore();
+        checkStatus();
+        break;
+      case 'ArrowLeft':
+      case 'a':
+        if (wasPressed) {
+          buttonStart.replaceWith(buttonRestart);
+          wasPressed = false;
+        }
+        clearField();
 
-// // #region tests for class game
-// // const initialState = [
-// //   [2, 0, 0, 0],
-// //   [2, 2, 2, 2],
-// //   [2, 2, 4, 4],
-// //   [2, 4, 8, 16],
-// // ];
+        if (game.getStatus() === 'playing') {
+          game.moveLeft();
+        }
+        connectJsCellsWithDOM();
+        changeScore();
+        checkStatus();
+        break;
+      case 'ArrowRight':
+      case 'd':
+        if (wasPressed) {
+          buttonStart.replaceWith(buttonRestart);
+          wasPressed = false;
+        }
+        clearField();
 
-// // const copyMas = [
-// //   [2, 0, 0, 0],
-// //   [2, 2, 2, 2],
-// //   [2, 2, 4, 4],
-// //   [2, 4, 8, 16],
-// // ];
-// // const score = 0;
+        if (game.getStatus() === 'playing') {
+          game.moveRight();
+        }
+        connectJsCellsWithDOM();
+        changeScore();
+        checkStatus();
+        break;
+    }
+  });
+}
 
-// // // moveUp();
-// // // console.log(initialState);
+function startTheGame() {
+  buttonRestart.classList.add('button');
+  buttonRestart.classList.add('restart');
+  buttonRestart.textContent = 'Restart';
 
-// // if (
-// //   initialState.every((row, i) =>
-// row.every((cell, j) => cell === copyMas[i][j]))
-// // ) {
-// //   console.log(initialState);
-// //   console.log(copyMas);
-// // }
+  eventListenerForArrows();
 
-// // // function moveUp() {
-// // //   let indexStart = -1;
+  buttonStart.addEventListener('click', (e) => {
+    messageStart.classList.add('hidden');
 
-// // //   for (let j = 0; j < 4; j++) {
-// // //     for (let i = 0; i < 4; i++) {
-// // //       if (initialState[i][j] === 0 && indexStart === -1) {
-// // //         indexStart = i;
-// // //       } else if (initialState[i][j] !== 0 && indexStart !== -1) {
-// // //         initialState[indexStart][j] = initialState[i][j];
-// // //         initialState[i][j] = 0;
-// // //         indexStart++;
-// // //       }
-// // //     }
+    clearField();
+    game.start();
+    connectJsCellsWithDOM();
+  });
 
-// // //     for (let i = 0; i < 3; i++) {
-// // //       if (
-// // //         initialState[i][j] === initialState[i + 1][j] &&
-// // //         initialState[i][j] !== 0
-// // //       ) {
-// // //         initialState[i][j] += initialState[i + 1][j];
-// // //         initialState[i + 1][j] = 0;
-// // //         score += initialState[i][j];
-// // //       }
-// // //     }
+  buttonRestart.addEventListener('click', (e) => {
+    clearField();
+    game.restart();
+    buttonRestart.replaceWith(buttonStart);
+  });
+}
 
-// // //     indexStart = -1;
+function connectJsCellsWithDOM() {
+  const gameMas = game.getState();
 
-// // //     for (let i = 0; i < 4; i++) {
-// // //       if (initialState[i][j] === 0 && indexStart === -1) {
-// // //         indexStart = i;
-// // //       } else if (initialState[i][j] !== 0 && indexStart !== -1) {
-// // //         initialState[indexStart][j] = initialState[i][j];
-// // //         initialState[i][j] = 0;
-// // //         indexStart++;
-// // //       }
-// // //     }
+  gameMas.forEach((row, i) => {
+    row.forEach((cell, j) => {
+      if (cell !== 0) {
+        domMas[i][j].textContent = cell;
+      }
+    });
+  });
+}
 
-// // //     indexStart = -1;
-// // //   }
+function clearField() {
+  domMas.forEach((row) => {
+    row.forEach((cell) => {
+      cell.textContent = ' ';
+    });
+  });
+}
 
-// // //   return score;
-// // // }
+function changeScore() {
+  const scoreDOM = document.querySelector('.game-score');
+  const scoreJS = game.getScore();
 
-// // // function moveRight() {
-// // //   let indexStart = -1;
+  scoreDOM.textContent = scoreJS;
+}
 
-// // //   initialState.forEach((row) => {
-// // //     console.log('before1zsuv', row);
+function checkStatus() {
+  const messageLose = document.querySelector('.message-lose');
+  const messageWin = document.querySelector('.message-win');
 
-// // //     for (let i = 3; i >= 0; i--) {
-// // //       if (row[i] === 0 && indexStart === -1) {
-// // //         indexStart = i;
-// // //       } else if (row[i] !== 0 && indexStart !== -1) {
-// // //         row[indexStart] = row[i];
-// // //         row[i] = 0;
-// // //         indexStart--;
-// // //       }
-// // //     }
+  const statusTheGame = game.getStatus();
 
-// // //     console.log('after1zsuv', row);
+  if (statusTheGame === 'win') {
+    messageWin.classList.remove('hidden');
+  } else if (statusTheGame === 'lose') {
+    messageLose.classList.remove('hidden');
+  }
+}
 
-// // //     for (let i = 3; i >= 1; i--) {
-// // //       if (row[i] === row[i - 1] && row[i] !== 0) {
-// // //         row[i] += row[i - 1];
-// // //         row[i - 1] = 0;
-// // //         score += row[i];
-// // //       }
-// // //     }
-
-// // //     console.log('afterSum', row);
-// // //     indexStart = -1;
-
-// // //     for (let i = 3; i >= 0; i--) {
-// // //       if (row[i] === 0 && indexStart === -1) {
-// // //         indexStart = i;
-// // //       } else if (row[i] !== 0 && indexStart !== -1) {
-// // //         row[indexStart] = row[i];
-// // //         row[i] = 0;
-// // //         indexStart--;
-// // //       }
-// // //     }
-// // //     console.log('after2zsuv', row);
-
-// // //     indexStart = -1;
-// // //   });
-// // // }
-
-// // // function moveLeft() {
-// // //   let indexStart = -1;
-// // //   let score = 0;
-
-// // //   initialState.forEach((row) => {
-// // //     console.log('before1zsuv', row);
-
-// // //     for (let i = 0; i < 4; i++) {
-// // //       if (row[i] === 0 && indexStart === -1) {
-// // //         indexStart = i;
-// // //       } else if (row[i] !== 0 && indexStart !== -1) {
-// // //         row[indexStart] = row[i];
-// // //         row[i] = 0;
-// // //         indexStart++;
-// // //       }
-// // //     }
-
-// // //     console.log('after1zsuv', row);
-
-// // //     for (let i = 0; i < 3; i++) {
-// // //       if (row[i] === row[i + 1]) {
-// // //         row[i] += row[i + 1];
-// // //         row[i + 1] = 0;
-// // //         score += row[i];
-// // //       }
-// // //     }
-
-// // //     console.log('afterSum', row);
-// // //     indexStart = -1;
-
-// // //     for (let i = 0; i < 4; i++) {
-// // //       if (row[i] === 0 && indexStart === -1) {
-// // //         indexStart = i;
-// // //       } else if (row[i] !== 0 && indexStart !== -1) {
-// // //         row[indexStart] = row[i];
-// // //         row[i] = 0;
-// // //         indexStart++;
-// // //       }
-// // //     }
-// // //     console.log('after2zsuv', row);
-
-// // //     indexStart = -1;
-// // //   });
-
-// // //   return score;
-// // // }
-// // #endregion
+startTheGame();

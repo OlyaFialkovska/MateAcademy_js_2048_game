@@ -1,21 +1,11 @@
 'use strict';
 
-/**
- * This class represents the game.
- * Now it has a basic structure, that is needed for testing.
- * Feel free to add more props and methods if needed.
- */
 class Game {
   rows = 4;
   columns = 4;
   fieldOfCells = [];
+  initialState = [];
   lengthOfMassive = this.rows * this.columns;
-  /**
-   * `idle` - the game has not started yet (the initial state);
-   * `playing` - the game is in progress;
-   * `win` - the game is won;
-   * `lose` - the game is lost
-   */
   status = 'idle';
   score = 0;
 
@@ -27,9 +17,8 @@ class Game {
       [0, 0, 0, 0],
     ],
   ) {
-    this.fieldOfCells = initialState;
-    // eslint-disable-next-line no-console
-    console.log(initialState);
+    this.fieldOfCells = initialState.map((row) => [...row]);
+    this.initialState = initialState.map((row) => [...row]);
   }
 
   moveLeft() {
@@ -259,16 +248,6 @@ class Game {
     return this.fieldOfCells;
   }
 
-  /**
-   * Returns the current game status.
-   *
-   * @returns {string} One of: 'idle', 'playing', 'win', 'lose'
-   *
-   * `idle` - the game has not started yet (the initial state);
-   * `playing` - the game is in progress;
-   * `win` - the game is won;
-   * `lose` - the game is lost
-   */
   getStatus() {
     return this.status;
   }
@@ -280,19 +259,10 @@ class Game {
   }
 
   restart() {
-    for (let i = 0; i < this.lengthOfMassive; i++) {
-      const indexRow = Math.floor(i / 4);
-      const indexColumn = i % 4;
-
-      this.fieldOfCells[indexRow][indexColumn] = 0;
-    }
+    this.fieldOfCells = this.initialState.map((row) => [...row]);
     this.score = 0;
-
-    this.start();
-    this.status = 'playing';
+    this.status = 'idle';
   }
-
-  // Add your own methods here
 
   addRandomTile() {
     const randomNumber = Math.random();
