@@ -8,7 +8,7 @@
 class Game {
   rows = 4;
   columns = 4;
-  initialStateOfField = [];
+  fieldOfCells = [];
   lengthOfMassive = this.rows * this.columns - 1;
   /**
    * `idle` - the game has not started yet (the initial state);
@@ -27,59 +27,175 @@ class Game {
       [0, 0, 0, 0],
     ],
   ) {
-    this.initialStateOfField = initialState;
+    this.fieldOfCells = initialState;
     // eslint-disable-next-line no-console
     console.log(initialState);
   }
 
   moveLeft() {
-    let indexStart = -1;
-    let value = -1;
-    let currChange = false;
+    let indexFirstZero = -1;
 
-    this.initialStateOfField.forEach((row) => {
+    this.fieldOfCells.forEach((row) => {
       for (let i = 0; i < this.columns; i++) {
-        if (row[i] === 0 && indexStart === -1) {
-          indexStart = i;
-        } else if (row[i] !== 0 && indexStart !== -1) {
-          if (row[indexStart - 1] === row[i] && !currChange) {
-            row[indexStart - 1] += row[i];
-          } else {
-            value = row[i];
-            row[indexStart] = value;
-            currChange = false;
-          }
+        if (row[i] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (row[i] !== 0 && indexFirstZero !== -1) {
+          row[indexFirstZero] = row[i];
           row[i] = 0;
-          i = indexStart;
-          indexStart = -1;
-        } else if (row[i] !== 0 && indexStart === -1) {
-          if (row[i] === row[i + 1]) {
-            row[i] += row[i + 1];
-            row[i + 1] = 0;
-            currChange = true;
-          }
+          indexFirstZero++;
         }
-        this.score += row[i];
       }
-      indexStart = -1;
-      value = -1;
-      currChange = false;
+
+      for (let i = 0; i < this.columns - 1; i++) {
+        if (row[i] === row[i + 1] && row[i] !== 0) {
+          row[i] += row[i + 1];
+          row[i + 1] = 0;
+          this.score += row[i];
+        }
+      }
+
+      indexFirstZero = -1;
 
       for (let i = 0; i < this.columns; i++) {
-        this.score += row[i];
+        if (row[i] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (row[i] !== 0 && indexFirstZero !== -1) {
+          row[indexFirstZero] = row[i];
+          row[i] = 0;
+          indexFirstZero++;
+        }
       }
+
+      indexFirstZero = -1;
     });
-  } // left + count the score
-  moveRight() {}
-  moveUp() {}
-  moveDown() {}
+  }
+
+  moveRight() {
+    let indexFirstZero = -1;
+
+    this.fieldOfCells.forEach((row) => {
+      for (let i = this.columns - 1; i >= 0; i--) {
+        if (row[i] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (row[i] !== 0 && indexFirstZero !== -1) {
+          row[indexFirstZero] = row[i];
+          row[i] = 0;
+          indexFirstZero--;
+        }
+      }
+
+      for (let i = this.columns - 1; i >= 1; i--) {
+        if (row[i] === row[i - 1] && row[i] !== 0) {
+          row[i] += row[i - 1];
+          row[i - 1] = 0;
+          this.score += row[i];
+        }
+      }
+
+      indexFirstZero = -1;
+
+      for (let i = this.columns - 1; i >= 0; i--) {
+        if (row[i] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (row[i] !== 0 && indexFirstZero !== -1) {
+          row[indexFirstZero] = row[i];
+          row[i] = 0;
+          indexFirstZero--;
+        }
+      }
+
+      indexFirstZero = -1;
+    });
+  }
+
+  moveUp() {
+    let indexFirstZero = -1;
+
+    for (let j = 0; j < this.columns; j++) {
+      for (let i = 0; i < this.rows; i++) {
+        if (this.fieldOfCells[i][j] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (this.fieldOfCells[i][j] !== 0 && indexFirstZero !== -1) {
+          this.fieldOfCells[indexFirstZero][j] = this.fieldOfCells[i][j];
+          this.fieldOfCells[i][j] = 0;
+          indexFirstZero++;
+        }
+      }
+
+      for (let i = 0; i < this.rows - 1; i++) {
+        if (
+          this.fieldOfCells[i][j] === this.fieldOfCells[i + 1][j] &&
+          this.fieldOfCells[i][j] !== 0
+        ) {
+          this.fieldOfCells[i][j] += this.fieldOfCells[i + 1][j];
+          this.fieldOfCells[i + 1][j] = 0;
+          this.score += this.fieldOfCells[i][j];
+        }
+      }
+
+      indexFirstZero = -1;
+
+      for (let i = 0; i < this.rows; i++) {
+        if (this.fieldOfCells[i][j] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (this.fieldOfCells[i][j] !== 0 && indexFirstZero !== -1) {
+          this.fieldOfCells[indexFirstZero][j] = this.fieldOfCells[i][j];
+          this.fieldOfCells[i][j] = 0;
+          indexFirstZero++;
+        }
+      }
+
+      indexFirstZero = -1;
+    }
+  }
+
+  moveDown() {
+    let indexFirstZero = -1;
+
+    for (let j = 0; j < this.columns; j++) {
+      for (let i = this.rows - 1; i >= 0; i--) {
+        if (this.fieldOfCells[i][j] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (this.fieldOfCells[i][j] !== 0 && indexFirstZero !== -1) {
+          this.fieldOfCells[indexFirstZero][j] = this.fieldOfCells[i][j];
+          this.fieldOfCells[i][j] = 0;
+          indexFirstZero--;
+        }
+      }
+
+      for (let i = this.rows - 1; i >= 1; i--) {
+        if (
+          this.fieldOfCells[i][j] === this.fieldOfCells[i - 1][j] &&
+          this.fieldOfCells[i][j] !== 0
+        ) {
+          this.fieldOfCells[i][j] += this.fieldOfCells[i - 1][j];
+          this.fieldOfCells[i - 1][j] = 0;
+          this.score += this.fieldOfCells[i][j];
+        }
+      }
+
+      indexFirstZero = -1;
+
+      for (let i = this.rows - 1; i >= 0; i--) {
+        if (this.fieldOfCells[i][j] === 0 && indexFirstZero === -1) {
+          indexFirstZero = i;
+        } else if (this.fieldOfCells[i][j] !== 0 && indexFirstZero !== -1) {
+          this.fieldOfCells[indexFirstZero][j] = this.fieldOfCells[i][j];
+          this.fieldOfCells[i][j] = 0;
+          indexFirstZero--;
+        }
+      }
+
+      indexFirstZero = -1;
+    }
+  }
 
   getScore() {
     return this.score;
   }
 
   getState() {
-    return this.initialStateOfField;
+    return this.fieldOfCells;
   }
 
   /**
@@ -107,7 +223,7 @@ class Game {
       const indexRow = Math.floor(i / 4);
       const indexColumn = i % 4;
 
-      this.initialStateOfField[indexRow][indexColumn] = 0;
+      this.fieldOfCells[indexRow][indexColumn] = 0;
     }
     this.score = 0;
 
@@ -126,13 +242,13 @@ class Game {
 
     let count = 0;
 
-    if (this.initialStateOfField[indexRow][indexColumn] === 2048) {
+    if (this.fieldOfCells[indexRow][indexColumn] === 2048) {
       this.status = 'win';
 
       return;
     }
 
-    while (this.initialStateOfField[indexRow][indexColumn] !== 0) {
+    while (this.fieldOfCells[indexRow][indexColumn] !== 0) {
       randomIndex = parseInt(Math.random() * this.lengthOfMassive);
       indexRow = Math.floor(randomIndex / this.rows);
       indexColumn = randomIndex % this.columns;
@@ -144,8 +260,7 @@ class Game {
       count++;
     }
 
-    this.initialStateOfField[indexRow][indexColumn] =
-      randomNumber >= 0.9 ? 4 : 2;
+    this.fieldOfCells[indexRow][indexColumn] = randomNumber >= 0.9 ? 4 : 2;
   }
 }
 

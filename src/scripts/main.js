@@ -30,53 +30,146 @@
 // Write your code here
 
 const initialState = [
-  [0, 2, 2, 0],
-  [4, 2, 2, 2],
-  [4, 2, 4, 2],
-  [4, 2, 2, 4],
+  [2, 0, 0, 0],
+  [2, 2, 2, 2],
+  [2, 2, 4, 4],
+  [2, 4, 8, 16],
 ];
+let score = 0;
 
-moveLeft();
+moveUp();
 // console.log(initialState);
-// console.log(score);
 
-function moveLeft() {
+function moveUp() {
   let indexStart = -1;
-  let value = -1;
-  let currChange = false;
-  let score = 0;
 
-  initialState.forEach((row) => {
+  for (let j = 0; j < 4; j++) {
     for (let i = 0; i < 4; i++) {
-      if (row[i] === 0 && indexStart === -1) {
+      if (initialState[i][j] === 0 && indexStart === -1) {
         indexStart = i;
-      } else if (row[i] !== 0 && indexStart !== -1) {
-        if (row[indexStart - 1] === row[i] && !currChange) {
-          row[indexStart - 1] += row[i];
-        } else {
-          value = row[i];
-          row[indexStart] = value;
-          currChange = false;
-        }
-        row[i] = 0;
-        i = indexStart;
-        indexStart = -1;
-      } else if (row[i] !== 0 && indexStart === -1) {
-        if (row[i] === row[i + 1]) {
-          row[i] += row[i + 1];
-          row[i + 1] = 0;
-          currChange = true;
-        }
+      } else if (initialState[i][j] !== 0 && indexStart !== -1) {
+        initialState[indexStart][j] = initialState[i][j];
+        initialState[i][j] = 0;
+        indexStart++;
       }
     }
+
+    for (let i = 0; i < 3; i++) {
+      if (
+        initialState[i][j] === initialState[i + 1][j] &&
+        initialState[i][j] !== 0
+      ) {
+        initialState[i][j] += initialState[i + 1][j];
+        initialState[i + 1][j] = 0;
+        score += initialState[i][j];
+      }
+    }
+
     indexStart = -1;
-    value = -1;
-    currChange = false;
 
     for (let i = 0; i < 4; i++) {
-      score += row[i];
+      if (initialState[i][j] === 0 && indexStart === -1) {
+        indexStart = i;
+      } else if (initialState[i][j] !== 0 && indexStart !== -1) {
+        initialState[indexStart][j] = initialState[i][j];
+        initialState[i][j] = 0;
+        indexStart++;
+      }
     }
-  });
+
+    indexStart = -1;
+  }
 
   return score;
 }
+
+// function moveRight() {
+//   let indexStart = -1;
+
+//   initialState.forEach((row) => {
+//     console.log('before1zsuv', row);
+
+//     for (let i = 3; i >= 0; i--) {
+//       if (row[i] === 0 && indexStart === -1) {
+//         indexStart = i;
+//       } else if (row[i] !== 0 && indexStart !== -1) {
+//         row[indexStart] = row[i];
+//         row[i] = 0;
+//         indexStart--;
+//       }
+//     }
+
+//     console.log('after1zsuv', row);
+
+//     for (let i = 3; i >= 1; i--) {
+//       if (row[i] === row[i - 1] && row[i] !== 0) {
+//         row[i] += row[i - 1];
+//         row[i - 1] = 0;
+//         score += row[i];
+//       }
+//     }
+
+//     console.log('afterSum', row);
+//     indexStart = -1;
+
+//     for (let i = 3; i >= 0; i--) {
+//       if (row[i] === 0 && indexStart === -1) {
+//         indexStart = i;
+//       } else if (row[i] !== 0 && indexStart !== -1) {
+//         row[indexStart] = row[i];
+//         row[i] = 0;
+//         indexStart--;
+//       }
+//     }
+//     console.log('after2zsuv', row);
+
+//     indexStart = -1;
+//   });
+// }
+
+// function moveLeft() {
+//   let indexStart = -1;
+//   let score = 0;
+
+//   initialState.forEach((row) => {
+//     console.log('before1zsuv', row);
+
+//     for (let i = 0; i < 4; i++) {
+//       if (row[i] === 0 && indexStart === -1) {
+//         indexStart = i;
+//       } else if (row[i] !== 0 && indexStart !== -1) {
+//         row[indexStart] = row[i];
+//         row[i] = 0;
+//         indexStart++;
+//       }
+//     }
+
+//     console.log('after1zsuv', row);
+
+//     for (let i = 0; i < 3; i++) {
+//       if (row[i] === row[i + 1]) {
+//         row[i] += row[i + 1];
+//         row[i + 1] = 0;
+//         score += row[i];
+//       }
+//     }
+
+//     console.log('afterSum', row);
+//     indexStart = -1;
+
+//     for (let i = 0; i < 4; i++) {
+//       if (row[i] === 0 && indexStart === -1) {
+//         indexStart = i;
+//       } else if (row[i] !== 0 && indexStart !== -1) {
+//         row[indexStart] = row[i];
+//         row[i] = 0;
+//         indexStart++;
+//       }
+//     }
+//     console.log('after2zsuv', row);
+
+//     indexStart = -1;
+//   });
+
+//   return score;
+// }
