@@ -9,7 +9,7 @@ class Game {
   rows = 4;
   columns = 4;
   fieldOfCells = [];
-  lengthOfMassive = this.rows * this.columns - 1;
+  lengthOfMassive = this.rows * this.columns;
   /**
    * `idle` - the game has not started yet (the initial state);
    * `playing` - the game is in progress;
@@ -33,6 +33,12 @@ class Game {
   }
 
   moveLeft() {
+    const copyMas = [];
+
+    this.fieldOfCells.forEach((row) => {
+      copyMas.push([...row]);
+    });
+
     let indexFirstZero = -1;
 
     this.fieldOfCells.forEach((row) => {
@@ -68,9 +74,25 @@ class Game {
 
       indexFirstZero = -1;
     });
+
+    if (
+      !this.fieldOfCells.every((row, i) => {
+        return row.every((cell, j) => cell === copyMas[i][j]);
+      })
+    ) {
+      this.addRandomTile();
+    }
+
+    this.updateStatus();
   }
 
   moveRight() {
+    const copyMas = [];
+
+    this.fieldOfCells.forEach((row) => {
+      copyMas.push([...row]);
+    });
+
     let indexFirstZero = -1;
 
     this.fieldOfCells.forEach((row) => {
@@ -106,9 +128,24 @@ class Game {
 
       indexFirstZero = -1;
     });
+
+    if (
+      !this.fieldOfCells.every((row, i) => {
+        return row.every((cell, j) => cell === copyMas[i][j]);
+      })
+    ) {
+      this.addRandomTile();
+    }
+    this.updateStatus();
   }
 
   moveUp() {
+    const copyMas = [];
+
+    this.fieldOfCells.forEach((row) => {
+      copyMas.push([...row]);
+    });
+
     let indexFirstZero = -1;
 
     for (let j = 0; j < this.columns; j++) {
@@ -147,9 +184,24 @@ class Game {
 
       indexFirstZero = -1;
     }
+
+    if (
+      !this.fieldOfCells.every((row, i) => {
+        return row.every((cell, j) => cell === copyMas[i][j]);
+      })
+    ) {
+      this.addRandomTile();
+    }
+    this.updateStatus();
   }
 
   moveDown() {
+    const copyMas = [];
+
+    this.fieldOfCells.forEach((row) => {
+      copyMas.push([...row]);
+    });
+
     let indexFirstZero = -1;
 
     for (let j = 0; j < this.columns; j++) {
@@ -188,6 +240,15 @@ class Game {
 
       indexFirstZero = -1;
     }
+
+    if (
+      !this.fieldOfCells.every((row, i) => {
+        return row.every((cell, j) => cell === copyMas[i][j]);
+      })
+    ) {
+      this.addRandomTile();
+    }
+    this.updateStatus();
   }
 
   getScore() {
@@ -240,27 +301,72 @@ class Game {
     let indexRow = Math.floor(randomIndex / this.rows);
     let indexColumn = randomIndex % this.columns;
 
-    let count = 0;
-
-    if (this.fieldOfCells[indexRow][indexColumn] === 2048) {
-      this.status = 'win';
-
-      return;
-    }
-
-    while (this.fieldOfCells[indexRow][indexColumn] !== 0) {
-      randomIndex = parseInt(Math.random() * this.lengthOfMassive);
-      indexRow = Math.floor(randomIndex / this.rows);
-      indexColumn = randomIndex % this.columns;
-
-      if (count === this.lengthOfMassive) {
-        this.status = 'lose';
-        break; // end the game  - there arent any empty place
+    if (this.checkEmptyCells()) {
+      while (this.fieldOfCells[indexRow][indexColumn] !== 0) {
+        randomIndex = parseInt(Math.random() * this.lengthOfMassive);
+        indexRow = Math.floor(randomIndex / this.rows);
+        indexColumn = randomIndex % this.columns;
       }
-      count++;
+      this.fieldOfCells[indexRow][indexColumn] = randomNumber >= 0.9 ? 4 : 2;
+    }
+  }
+
+  checkStillPlaying() {
+    let isPlaying = false;
+
+    for (let j = 0; j < this.rows; j++) {
+      for (let i = 0; i < this.columns - 1; i++) {
+        if (
+          this.fieldOfCells[j][i] === this.fieldOfCells[j][i + 1] ||
+          this.fieldOfCells[i][j] === this.fieldOfCells[i + 1][j]
+        ) {
+          isPlaying = true;
+          break;
+        }
+      }
     }
 
-    this.fieldOfCells[indexRow][indexColumn] = randomNumber >= 0.9 ? 4 : 2;
+    return isPlaying;
+  }
+
+  checkEmptyCells() {
+    let isFree = false;
+
+    this.fieldOfCells.forEach((row) => {
+      for (let i = 0; i < this.columns; i++) {
+        if (row[i] === 0) {
+          isFree = true;
+          break;
+        }
+      }
+    });
+
+    return isFree;
+  }
+
+  check2048Cells() {
+    let isWin = false;
+
+    this.fieldOfCells.forEach((row) => {
+      for (let i = 0; i < this.columns; i++) {
+        if (row[i] === 2048) {
+          isWin = true;
+          break;
+        }
+      }
+    });
+
+    return isWin;
+  }
+
+  updateStatus() {
+    if (this.check2048Cells()) {
+      this.status = 'win';
+    } else if (this.checkEmptyCells() || this.checkStillPlaying()) {
+      this.status = 'playing';
+    } else {
+      this.status = `lose`;
+    }
   }
 }
 
