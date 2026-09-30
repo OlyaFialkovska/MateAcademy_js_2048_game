@@ -24,10 +24,12 @@ body {
 }
 
 .field-cell--2 {
+  color: #776e65;
   background: #eee4da;
 }
 
 .field-cell--4 {
+  color: #776e65;
   background: #ede0c8;
 }
 
@@ -138,12 +140,13 @@ h1 {
 }
 
 .start {
-  background: #1dae28;
+  background: #8f7a66;
   font-size: 20px;
+  transition: hover 1s;
 }
 
 .start:hover {
-  background: #179921;
+  background: #9f8a75;
 }
 
 .restart {

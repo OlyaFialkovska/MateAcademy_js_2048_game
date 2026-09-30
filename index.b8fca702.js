@@ -588,191 +588,216 @@ function hmrAccept(bundle /*: ParcelRequire */ , id /*: string */ ) {
 // Uncomment the next lines to use your game instance in the browser
 const Game = require("789b00406e138236");
 const game = new Game();
-function eventListenerForArrows() {
-    addEventListener("keydown", (e)=>{
+const domMas = [
+    ...document.querySelectorAll("tr")
+].map((tr)=>[
+        ...tr.children
+    ]);
+let wasPressed = true;
+const messageStart = document.querySelector(".message.message-start");
+const messageLose = document.querySelector(".message-lose");
+const messageWin = document.querySelector(".message-win");
+function eventListenerForArrows(buttonStart, buttonRestart) {
+    let stateBeforeMove = [];
+    let stateAfterMove = [];
+    document.addEventListener("keydown", (e)=>{
         switch(e.key){
             case "ArrowUp":
             case "w":
-                //moveUp();
-                console.log("w - Up");
+                clearField();
+                if (game.getStatus() === "playing") {
+                    stateBeforeMove = game.getState().map((row)=>[
+                            ...row
+                        ]);
+                    game.moveUp();
+                    stateAfterMove = [
+                        ...game.getState()
+                    ];
+                    const isChanged = !stateBeforeMove.every((row, i)=>{
+                        return row.every((cell, j)=>stateAfterMove[i][j] === cell);
+                    });
+                    if (wasPressed && isChanged) {
+                        buttonStart.replaceWith(buttonRestart);
+                        wasPressed = false;
+                    }
+                }
+                connectJsCellsWithDOM();
+                changeScore();
+                checkStatus();
                 break;
             case "ArrowDown":
             case "s":
-                //moveDown();
-                console.log("s - Down");
+                clearField();
+                if (game.getStatus() === "playing") {
+                    stateBeforeMove = game.getState().map((row)=>[
+                            ...row
+                        ]);
+                    game.moveDown();
+                    stateAfterMove = [
+                        ...game.getState()
+                    ];
+                    const isChanged = !stateBeforeMove.every((row, i)=>{
+                        return row.every((cell, j)=>stateAfterMove[i][j] === cell);
+                    });
+                    if (wasPressed && isChanged) {
+                        buttonStart.replaceWith(buttonRestart);
+                        wasPressed = false;
+                    }
+                }
+                connectJsCellsWithDOM();
+                changeScore();
+                checkStatus();
                 break;
             case "ArrowLeft":
             case "a":
-                //moveLeft();
-                console.log("a - Left");
+                clearField();
+                if (game.getStatus() === "playing") {
+                    stateBeforeMove = game.getState().map((row)=>[
+                            ...row
+                        ]);
+                    game.moveLeft();
+                    stateAfterMove = [
+                        ...game.getState()
+                    ];
+                    const isChanged = !stateBeforeMove.every((row, i)=>{
+                        return row.every((cell, j)=>stateAfterMove[i][j] === cell);
+                    });
+                    if (wasPressed && isChanged) {
+                        buttonStart.replaceWith(buttonRestart);
+                        wasPressed = false;
+                    }
+                }
+                connectJsCellsWithDOM();
+                changeScore();
+                checkStatus();
                 break;
             case "ArrowRight":
             case "d":
-                //moveRight();
-                console.log("d - Right");
+                clearField();
+                if (game.getStatus() === "playing") {
+                    stateBeforeMove = game.getState().map((row)=>[
+                            ...row
+                        ]);
+                    game.moveRight();
+                    stateAfterMove = [
+                        ...game.getState()
+                    ];
+                    const isChanged = !stateBeforeMove.every((row, i)=>{
+                        return row.every((cell, j)=>stateAfterMove[i][j] === cell);
+                    });
+                    if (wasPressed && isChanged) {
+                        buttonStart.replaceWith(buttonRestart);
+                        wasPressed = false;
+                    }
+                }
+                connectJsCellsWithDOM();
+                changeScore();
+                checkStatus();
                 break;
         }
     });
 }
 function startTheGame() {
     const buttonStart = document.querySelector(".button.start");
+    const buttonRestart = document.createElement("button");
+    buttonRestart.classList.add("button");
+    buttonRestart.classList.add("restart");
+    buttonRestart.textContent = "Restart";
+    eventListenerForArrows(buttonStart, buttonRestart);
     buttonStart.addEventListener("click", (e)=>{
-        console.log(e.target);
+        messageStart.classList.add("hidden");
+        clearField();
+        game.start();
+        connectJsCellsWithDOM();
     });
-    console.log(buttonStart.textContent);
+    buttonRestart.addEventListener("click", (e)=>{
+        messageStart.classList.remove("hidden");
+        messageLose.classList.add("hidden");
+        messageWin.classList.add("hidden");
+        clearField();
+        game.restart();
+        changeScore();
+        wasPressed = true;
+        buttonRestart.replaceWith(buttonStart);
+    });
 }
-eventListenerForArrows();
-startTheGame(); //#region tests for class game
- // const initialState = [
- //   [2, 0, 0, 0],
- //   [2, 2, 2, 2],
- //   [2, 2, 4, 4],
- //   [2, 4, 8, 16],
- // ];
- // const copyMas = [
- //   [2, 0, 0, 0],
- //   [2, 2, 2, 2],
- //   [2, 2, 4, 4],
- //   [2, 4, 8, 16],
- // ];
- // const score = 0;
- // // moveUp();
- // // console.log(initialState);
- // if (
- //   initialState.every((row, i) => row.every((cell, j) => cell === copyMas[i][j]))
- // ) {
- //   console.log(initialState);
- //   console.log(copyMas);
- // }
- // // function moveUp() {
- // //   let indexStart = -1;
- // //   for (let j = 0; j < 4; j++) {
- // //     for (let i = 0; i < 4; i++) {
- // //       if (initialState[i][j] === 0 && indexStart === -1) {
- // //         indexStart = i;
- // //       } else if (initialState[i][j] !== 0 && indexStart !== -1) {
- // //         initialState[indexStart][j] = initialState[i][j];
- // //         initialState[i][j] = 0;
- // //         indexStart++;
- // //       }
- // //     }
- // //     for (let i = 0; i < 3; i++) {
- // //       if (
- // //         initialState[i][j] === initialState[i + 1][j] &&
- // //         initialState[i][j] !== 0
- // //       ) {
- // //         initialState[i][j] += initialState[i + 1][j];
- // //         initialState[i + 1][j] = 0;
- // //         score += initialState[i][j];
- // //       }
- // //     }
- // //     indexStart = -1;
- // //     for (let i = 0; i < 4; i++) {
- // //       if (initialState[i][j] === 0 && indexStart === -1) {
- // //         indexStart = i;
- // //       } else if (initialState[i][j] !== 0 && indexStart !== -1) {
- // //         initialState[indexStart][j] = initialState[i][j];
- // //         initialState[i][j] = 0;
- // //         indexStart++;
- // //       }
- // //     }
- // //     indexStart = -1;
- // //   }
- // //   return score;
- // // }
- // // function moveRight() {
- // //   let indexStart = -1;
- // //   initialState.forEach((row) => {
- // //     console.log('before1zsuv', row);
- // //     for (let i = 3; i >= 0; i--) {
- // //       if (row[i] === 0 && indexStart === -1) {
- // //         indexStart = i;
- // //       } else if (row[i] !== 0 && indexStart !== -1) {
- // //         row[indexStart] = row[i];
- // //         row[i] = 0;
- // //         indexStart--;
- // //       }
- // //     }
- // //     console.log('after1zsuv', row);
- // //     for (let i = 3; i >= 1; i--) {
- // //       if (row[i] === row[i - 1] && row[i] !== 0) {
- // //         row[i] += row[i - 1];
- // //         row[i - 1] = 0;
- // //         score += row[i];
- // //       }
- // //     }
- // //     console.log('afterSum', row);
- // //     indexStart = -1;
- // //     for (let i = 3; i >= 0; i--) {
- // //       if (row[i] === 0 && indexStart === -1) {
- // //         indexStart = i;
- // //       } else if (row[i] !== 0 && indexStart !== -1) {
- // //         row[indexStart] = row[i];
- // //         row[i] = 0;
- // //         indexStart--;
- // //       }
- // //     }
- // //     console.log('after2zsuv', row);
- // //     indexStart = -1;
- // //   });
- // // }
- // // function moveLeft() {
- // //   let indexStart = -1;
- // //   let score = 0;
- // //   initialState.forEach((row) => {
- // //     console.log('before1zsuv', row);
- // //     for (let i = 0; i < 4; i++) {
- // //       if (row[i] === 0 && indexStart === -1) {
- // //         indexStart = i;
- // //       } else if (row[i] !== 0 && indexStart !== -1) {
- // //         row[indexStart] = row[i];
- // //         row[i] = 0;
- // //         indexStart++;
- // //       }
- // //     }
- // //     console.log('after1zsuv', row);
- // //     for (let i = 0; i < 3; i++) {
- // //       if (row[i] === row[i + 1]) {
- // //         row[i] += row[i + 1];
- // //         row[i + 1] = 0;
- // //         score += row[i];
- // //       }
- // //     }
- // //     console.log('afterSum', row);
- // //     indexStart = -1;
- // //     for (let i = 0; i < 4; i++) {
- // //       if (row[i] === 0 && indexStart === -1) {
- // //         indexStart = i;
- // //       } else if (row[i] !== 0 && indexStart !== -1) {
- // //         row[indexStart] = row[i];
- // //         row[i] = 0;
- // //         indexStart++;
- // //       }
- // //     }
- // //     console.log('after2zsuv', row);
- // //     indexStart = -1;
- // //   });
- // //   return score;
- // // }
- //#endregion
+function connectJsCellsWithDOM() {
+    const gameMas = game.getState();
+    gameMas.forEach((row, i)=>{
+        row.forEach((cell, j)=>{
+            if (cell !== 0) {
+                domMas[i][j].textContent = cell;
+                addClassesForColourCells(domMas[i][j]);
+            }
+        });
+    });
+}
+function clearField() {
+    domMas.forEach((row)=>{
+        row.forEach((cell)=>{
+            cell.textContent = " ";
+            cell.className = "field-cell";
+        });
+    });
+}
+function changeScore() {
+    const scoreDOM = document.querySelector(".game-score");
+    const scoreJS = game.getScore();
+    scoreDOM.textContent = scoreJS;
+}
+function checkStatus() {
+    const statusTheGame = game.getStatus();
+    if (statusTheGame === "win") messageWin.classList.remove("hidden");
+    else if (statusTheGame === "lose") messageLose.classList.remove("hidden");
+}
+function addClassesForColourCells(cell) {
+    switch(cell.textContent){
+        case "2":
+            cell.classList.add("field-cell--2");
+            break;
+        case "4":
+            cell.classList.add("field-cell--4");
+            break;
+        case "8":
+            cell.classList.add("field-cell--8");
+            break;
+        case "16":
+            cell.classList.add("field-cell--16");
+            break;
+        case "32":
+            cell.classList.add("field-cell--32");
+            break;
+        case "64":
+            cell.classList.add("field-cell--64");
+            break;
+        case "128":
+            cell.classList.add("field-cell--128");
+            break;
+        case "256":
+            cell.classList.add("field-cell--256");
+            break;
+        case "512":
+            cell.classList.add("field-cell--512");
+            break;
+        case "1024":
+            cell.classList.add("field-cell--1024");
+            break;
+        case "2048":
+            cell.classList.add("field-cell--2048");
+            break;
+    }
+}
+startTheGame();
 
 },{"789b00406e138236":"eIbh2"}],"eIbh2":[function(require,module,exports) {
 "use strict";
-/**
- * This class represents the game.
- * Now it has a basic structure, that is needed for testing.
- * Feel free to add more props and methods if needed.
- */ class Game {
+class Game {
     rows = 4;
     columns = 4;
     fieldOfCells = [];
+    initialState = [];
     lengthOfMassive = this.rows * this.columns;
-    /**
-   * `idle` - the game has not started yet (the initial state);
-   * `playing` - the game is in progress;
-   * `win` - the game is won;
-   * `lose` - the game is lost
-   */ status = "idle";
+    status = "idle";
     score = 0;
     constructor(initialState = [
         [
@@ -800,9 +825,12 @@ startTheGame(); //#region tests for class game
             0
         ]
     ]){
-        this.fieldOfCells = initialState;
-        // eslint-disable-next-line no-console
-        console.log(initialState);
+        this.fieldOfCells = initialState.map((row)=>[
+                ...row
+            ]);
+        this.initialState = initialState.map((row)=>[
+                ...row
+            ]);
     }
     moveLeft() {
         const copyMas = [];
@@ -962,34 +990,24 @@ startTheGame(); //#region tests for class game
     getState() {
         return this.fieldOfCells;
     }
-    /**
-   * Returns the current game status.
-   *
-   * @returns {string} One of: 'idle', 'playing', 'win', 'lose'
-   *
-   * `idle` - the game has not started yet (the initial state);
-   * `playing` - the game is in progress;
-   * `win` - the game is won;
-   * `lose` - the game is lost
-   */ getStatus() {
+    getStatus() {
         return this.status;
     }
     start() {
+        this.fieldOfCells = this.initialState.map((row)=>[
+                ...row
+            ]);
         this.addRandomTile();
         this.addRandomTile();
         this.status = "playing";
     }
     restart() {
-        for(let i = 0; i < this.lengthOfMassive; i++){
-            const indexRow = Math.floor(i / 4);
-            const indexColumn = i % 4;
-            this.fieldOfCells[indexRow][indexColumn] = 0;
-        }
+        this.fieldOfCells = this.initialState.map((row)=>[
+                ...row
+            ]);
         this.score = 0;
-        this.start();
-        this.status = "playing";
+        this.status = "idle";
     }
-    // Add your own methods here
     addRandomTile() {
         const randomNumber = Math.random();
         let randomIndex = parseInt(Math.random() * this.lengthOfMassive);
