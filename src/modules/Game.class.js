@@ -253,6 +253,7 @@ class Game {
   }
 
   start() {
+    this.fieldOfCells = this.initialState.map((row) => [...row]);
     this.addRandomTile();
     this.addRandomTile();
     this.status = 'playing';

@@ -110,6 +110,7 @@ function connectJsCellsWithDOM() {
     row.forEach((cell, j) => {
       if (cell !== 0) {
         domMas[i][j].textContent = cell;
+        addClassesForColourCells(domMas[i][j]);
       }
     });
   });
@@ -119,6 +120,7 @@ function clearField() {
   domMas.forEach((row) => {
     row.forEach((cell) => {
       cell.textContent = ' ';
+      cell.className = 'field-cell';
     });
   });
 }
@@ -140,6 +142,44 @@ function checkStatus() {
     messageWin.classList.remove('hidden');
   } else if (statusTheGame === 'lose') {
     messageLose.classList.remove('hidden');
+  }
+}
+
+function addClassesForColourCells(cell) {
+  switch (cell.textContent) {
+    case '2':
+      cell.classList.add('field-cell--2');
+      break;
+    case '4':
+      cell.classList.add('field-cell--4');
+      break;
+    case '8':
+      cell.classList.add('field-cell--8');
+      break;
+    case '16':
+      cell.classList.add('field-cell--16');
+      break;
+    case '32':
+      cell.classList.add('field-cell--32');
+      break;
+    case '64':
+      cell.classList.add('field-cell--64');
+      break;
+    case '128':
+      cell.classList.add('field-cell--128');
+      break;
+    case '256':
+      cell.classList.add('field-cell--256');
+      break;
+    case '512':
+      cell.classList.add('field-cell--512');
+      break;
+    case '1024':
+      cell.classList.add('field-cell--1024');
+      break;
+    case '2048':
+      cell.classList.add('field-cell--2048');
+      break;
   }
 }
 
