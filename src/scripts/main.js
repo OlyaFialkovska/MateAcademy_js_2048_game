@@ -8,25 +8,35 @@ const domMas = [...document.querySelectorAll('tr')].map((tr) => [
   ...tr.children,
 ]);
 
-const buttonStart = document.querySelector('.button.start');
-const messageStart = document.querySelector('.message.message-start');
-const buttonRestart = document.createElement('button');
-
 let wasPressed = true;
 
-function eventListenerForArrows() {
+const messageStart = document.querySelector('.message.message-start');
+const messageLose = document.querySelector('.message-lose');
+const messageWin = document.querySelector('.message-win');
+
+function eventListenerForArrows(buttonStart, buttonRestart) {
+  let stateBeforeMove = [];
+  let stateAfterMove = [];
+
   document.addEventListener('keydown', (e) => {
     switch (e.key) {
       case 'ArrowUp':
       case 'w':
-        if (wasPressed) {
-          buttonStart.replaceWith(buttonRestart);
-          wasPressed = false;
-        }
         clearField();
 
         if (game.getStatus() === 'playing') {
+          stateBeforeMove = game.getState().map((row) => [...row]);
           game.moveUp();
+          stateAfterMove = [...game.getState()];
+
+          const isChanged = !stateBeforeMove.every((row, i) => {
+            return row.every((cell, j) => stateAfterMove[i][j] === cell);
+          });
+
+          if (wasPressed && isChanged) {
+            buttonStart.replaceWith(buttonRestart);
+            wasPressed = false;
+          }
         }
         connectJsCellsWithDOM();
         changeScore();
@@ -34,14 +44,21 @@ function eventListenerForArrows() {
         break;
       case 'ArrowDown':
       case 's':
-        if (wasPressed) {
-          buttonStart.replaceWith(buttonRestart);
-          wasPressed = false;
-        }
         clearField();
 
         if (game.getStatus() === 'playing') {
+          stateBeforeMove = game.getState().map((row) => [...row]);
           game.moveDown();
+          stateAfterMove = [...game.getState()];
+
+          const isChanged = !stateBeforeMove.every((row, i) => {
+            return row.every((cell, j) => stateAfterMove[i][j] === cell);
+          });
+
+          if (wasPressed && isChanged) {
+            buttonStart.replaceWith(buttonRestart);
+            wasPressed = false;
+          }
         }
         connectJsCellsWithDOM();
         changeScore();
@@ -49,14 +66,21 @@ function eventListenerForArrows() {
         break;
       case 'ArrowLeft':
       case 'a':
-        if (wasPressed) {
-          buttonStart.replaceWith(buttonRestart);
-          wasPressed = false;
-        }
         clearField();
 
         if (game.getStatus() === 'playing') {
+          stateBeforeMove = game.getState().map((row) => [...row]);
           game.moveLeft();
+          stateAfterMove = [...game.getState()];
+
+          const isChanged = !stateBeforeMove.every((row, i) => {
+            return row.every((cell, j) => stateAfterMove[i][j] === cell);
+          });
+
+          if (wasPressed && isChanged) {
+            buttonStart.replaceWith(buttonRestart);
+            wasPressed = false;
+          }
         }
         connectJsCellsWithDOM();
         changeScore();
@@ -64,14 +88,21 @@ function eventListenerForArrows() {
         break;
       case 'ArrowRight':
       case 'd':
-        if (wasPressed) {
-          buttonStart.replaceWith(buttonRestart);
-          wasPressed = false;
-        }
         clearField();
 
         if (game.getStatus() === 'playing') {
+          stateBeforeMove = game.getState().map((row) => [...row]);
           game.moveRight();
+          stateAfterMove = [...game.getState()];
+
+          const isChanged = !stateBeforeMove.every((row, i) => {
+            return row.every((cell, j) => stateAfterMove[i][j] === cell);
+          });
+
+          if (wasPressed && isChanged) {
+            buttonStart.replaceWith(buttonRestart);
+            wasPressed = false;
+          }
         }
         connectJsCellsWithDOM();
         changeScore();
@@ -82,11 +113,14 @@ function eventListenerForArrows() {
 }
 
 function startTheGame() {
+  const buttonStart = document.querySelector('.button.start');
+  const buttonRestart = document.createElement('button');
+
   buttonRestart.classList.add('button');
   buttonRestart.classList.add('restart');
   buttonRestart.textContent = 'Restart';
 
-  eventListenerForArrows();
+  eventListenerForArrows(buttonStart, buttonRestart);
 
   buttonStart.addEventListener('click', (e) => {
     messageStart.classList.add('hidden');
@@ -97,8 +131,15 @@ function startTheGame() {
   });
 
   buttonRestart.addEventListener('click', (e) => {
+    messageStart.classList.remove('hidden');
+    messageLose.classList.add('hidden');
+    messageWin.classList.add('hidden');
+
     clearField();
     game.restart();
+    changeScore();
+    wasPressed = true;
+
     buttonRestart.replaceWith(buttonStart);
   });
 }
@@ -133,9 +174,6 @@ function changeScore() {
 }
 
 function checkStatus() {
-  const messageLose = document.querySelector('.message-lose');
-  const messageWin = document.querySelector('.message-win');
-
   const statusTheGame = game.getStatus();
 
   if (statusTheGame === 'win') {
